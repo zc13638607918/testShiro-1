@@ -1,4 +1,4 @@
-import com.zc.User;
+import com.zc.pojo.User;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -63,7 +63,7 @@ public class TestShiro {
         for (User user : users) {
             for (String role : roles) {
                 if (login(user))
-                    if (hasRole(user, role))
+                    if (hasRole(role))
                         System.out.printf("%s\t 拥有角色：%s\t%n", user.getName(), role);
                     else
                         System.out.printf("%s\t 不拥有角色：%s\t%n", user.getName(), role);
@@ -75,7 +75,7 @@ public class TestShiro {
         for (User user : users) {
             for (String permit : permits) {
                 if (login(user))
-                    if (isPermitted(user, permit))
+                    if (isPermitted(permit))
                         System.out.printf("%s\t 拥有权限：%s\t%n", user.getName(), permit);
                     else
                         System.out.printf("%s\t 不拥有权限：%s\t%n", user.getName(), permit);
@@ -84,18 +84,18 @@ public class TestShiro {
 
     }
 
-    private static boolean hasRole(User user, String role) {
-        Subject subject = getSubject(user);
+    private static boolean hasRole( String role) {
+        Subject subject = getSubject();
         return subject.hasRole(role);
     }
 
-    private static boolean isPermitted(User user, String permit) {
-        Subject subject = getSubject(user);
+    private static boolean isPermitted(String permit) {
+        Subject subject = getSubject();
         return subject.isPermitted(permit);
     }
 
-    private static Subject getSubject(User user) {
-        Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini.bak");
+    private static Subject getSubject() {
+        Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
         SecurityManager sm = factory.getInstance();
         SecurityUtils.setSecurityManager(sm);
         Subject subject = SecurityUtils.getSubject();
@@ -103,7 +103,7 @@ public class TestShiro {
     }
 
     private static boolean login(User user) {
-        Subject subject = getSubject(user);
+        Subject subject = getSubject();
         if (subject.isAuthenticated()) {
             subject.logout();
         }

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zc.User;
+import com.zc.pojo.User;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
