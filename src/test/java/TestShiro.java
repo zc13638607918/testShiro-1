@@ -1,8 +1,10 @@
+import com.zc.DAO.DAO;
 import com.zc.pojo.User;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
@@ -31,18 +33,24 @@ public class TestShiro {
         wang5.setName("wang5");
         wang5.setPassword("wrongpassword");
 
+        //new DAO().createUser("zhouchao", "zc88869176");
+        User zhouchao = new User("zhouchao", "zc88869176");
+
         List<User> users = new ArrayList<>();
 
         users.add(zhang3);
         users.add(li4);
         users.add(wang5);
+        users.add(zhouchao);
 
         String roleAdmin = "admin";
         String roleProductManager = "productManager";
+        String orderManager = "orderManager";
 
         List<String> roles = new ArrayList<>();
         roles.add(roleAdmin);
         roles.add(roleProductManager);
+        roles.add(orderManager);
 
         String permitAddProduct = "addProduct";
         String permitAddOrder = "addOrder";
@@ -61,30 +69,32 @@ public class TestShiro {
         System.out.println("************************");
 
         for (User user : users) {
-            for (String role : roles) {
-                if (login(user))
+            if (login(user)) {
+                for (String role : roles) {
                     if (hasRole(role))
                         System.out.printf("%s\t 拥有角色：%s\t%n", user.getName(), role);
                     else
                         System.out.printf("%s\t 不拥有角色：%s\t%n", user.getName(), role);
+                }
             }
         }
 
         System.out.println("*******************************");
 
         for (User user : users) {
-            for (String permit : permits) {
-                if (login(user))
+            if (login(user)) {
+                for (String permit : permits) {
                     if (isPermitted(permit))
                         System.out.printf("%s\t 拥有权限：%s\t%n", user.getName(), permit);
                     else
                         System.out.printf("%s\t 不拥有权限：%s\t%n", user.getName(), permit);
+                }
             }
         }
 
     }
 
-    private static boolean hasRole( String role) {
+    private static boolean hasRole(String role) {
         Subject subject = getSubject();
         return subject.hasRole(role);
     }
@@ -107,7 +117,6 @@ public class TestShiro {
         if (subject.isAuthenticated()) {
             subject.logout();
         }
-
         UsernamePasswordToken token = new UsernamePasswordToken(user.getName(), user.getPassword());
         try {
             subject.login(token);
